@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <title>MG Captures | Wedding Photography and Films, Hisar and Chandigarh</title>
+  <meta name="description" content="MG Captures: wedding and pre-wedding photography and films in Hisar and Chandigarh. Book a free consultation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://picsum.photos" />
+  <link rel="preload" as="image" href="https://picsum.photos/seed/studio-hero-portrait/1200/1400" fetchpriority="high" />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Quattrocento+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.13/dist/lenis.css" />
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Runs before paint so a saved dark choice never flashes light first.
+    document.documentElement.classList.add('js');
+    try { if (localStorage.getItem('theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+  </script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu">
+      <i class="ph ph-list" aria-hidden="true"></i> <span data-menu-label>Menu</span>
+    </button>
+    <a class="header-brand" href="#top" data-studio="name">Studio</a>
+    <div class="header-actions">
+      <button class="theme-toggle" type="button" aria-label="Switch to dark theme"><i class="ph ph-moon" aria-hidden="true"></i></button>
+      <a class="btn btn-light btn-sm header-book" href="#book">Book consultation</a>
+    </div>
+  </header>
+  <nav id="menu" class="menu" hidden>
+    <a href="#services">Services</a>
+    <a href="#work">Work</a>
+    <a href="#films" data-films-link hidden>Films</a>
+    <a href="#about">About</a>
+    <a href="#praise">Praise</a>
+    <a href="#book">Book consultation</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-media">
+        <img src="https://picsum.photos/seed/studio-hero-portrait/1200/1400" width="1200" height="1400" fetchpriority="high" alt="Wedding photograph" />
+      </div>
+      <div class="hero-copy">
+        <p class="hero-place hero-in" style="--i:0">Weddings and films, <span data-studio="city">City</span></p>
+        <h1 class="hero-in" style="--i:1">Weddings told <em>in Light</em></h1>
+        <p class="hero-sub hero-in" style="--i:2">Wedding and pre-wedding photography and films, planned with you.</p>
+        <a class="btn btn-light hero-in" style="--i:3" href="#book">Book consultation</a>
+      </div>
+    </section>
+
+    <section class="manifesto" aria-label="About our approach">
+      <img class="m-img m-img-1" data-parallax style="--speed:1.2" src="https://picsum.photos/seed/studio-manifesto-couple/700/900" width="700" height="900" alt="" loading="lazy" />
+      <img class="m-img m-img-2" data-parallax style="--speed:-0.9" src="https://picsum.photos/seed/studio-manifesto-detail/700/900" width="700" height="900" alt="" loading="lazy" />
+      <p class="manifesto-text" data-split>Every photograph begins <em>with a conversation.</em></p>
+    </section>
+
+    <section id="services" class="services">
+      <div class="services-head">
+        <div>
+          <h2 data-split><em>Every</em> STORY</h2>
+          <p data-reveal>From the pre-wedding shoot to the last dance at the reception, every booking starts with a conversation about the look, the places and the budget.</p>
+        </div>
+        <div class="float-img" data-parallax data-reveal-img style="--speed:-1.4"><img src="https://picsum.photos/seed/studio-services-float/600/760" width="600" height="760" alt="" loading="lazy" /></div>
+      </div>
+      <div class="strips" data-reveal>
+        <a class="strip" href="#book" data-shoot="Wedding">
+          <img src="https://picsum.photos/seed/studio-service-wedding/700/1000" width="700" height="1000" alt="" loading="lazy" />
+          <span class="strip-name">Weddings</span><span class="strip-price">Candid and traditional coverage</span>
+        </a>
+        <a class="strip" href="#book" data-shoot="Pre-wedding">
+          <img src="https://picsum.photos/seed/studio-service-prewedding/700/1000" width="700" height="1000" alt="" loading="lazy" />
+          <span class="strip-name">Pre-weddings</span><span class="strip-price">Concept, locations and styling</span>
+        </a>
+        <a class="strip" href="#book" data-shoot="Wedding film">
+          <img src="https://picsum.photos/seed/studio-service-film/700/1000" width="700" height="1000" alt="" loading="lazy" />
+          <span class="strip-name">Wedding films</span><span class="strip-price">Teasers and full-length films</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="work" class="work">
+      <h2 data-split>EXPLORE <em>Photographs</em></h2>
+      <div class="filters" role="group" aria-label="Filter photographs" data-reveal>
+        <button type="button" aria-pressed="true" data-filter="all">All</button>
+        <button type="button" aria-pressed="false" data-filter="wedding">Weddings</button>
+        <button type="button" aria-pressed="false" data-filter="prewedding">Pre-weddings</button>
+      </div>
+      <div class="masonry">
+        <button class="shot" data-cat="wedding" type="button"><img src="https://picsum.photos/seed/mg-work-wedding-1/700/933" width="700" height="933" alt="Wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="prewedding" type="button"><img src="https://picsum.photos/seed/mg-work-prewedding-2/700/525" width="700" height="525" alt="Pre-wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="wedding" type="button"><img src="https://picsum.photos/seed/mg-work-wedding-3/700/1050" width="700" height="1050" alt="Wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="prewedding" type="button"><img src="https://picsum.photos/seed/mg-work-prewedding-4/700/700" width="700" height="700" alt="Pre-wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="wedding" type="button"><img src="https://picsum.photos/seed/mg-work-wedding-5/700/525" width="700" height="525" alt="Wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="prewedding" type="button"><img src="https://picsum.photos/seed/mg-work-prewedding-6/700/933" width="700" height="933" alt="Pre-wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="wedding" type="button"><img src="https://picsum.photos/seed/mg-work-wedding-7/700/933" width="700" height="933" alt="Wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="prewedding" type="button"><img src="https://picsum.photos/seed/mg-work-prewedding-8/700/700" width="700" height="700" alt="Pre-wedding photograph" loading="lazy" /></button>
+        <button class="shot" data-cat="wedding" type="button"><img src="https://picsum.photos/seed/mg-work-wedding-9/700/1050" width="700" height="1050" alt="Wedding photograph" loading="lazy" /></button>
+      </div>
+      <p class="center"><a class="arrow-link" data-studio-ig href="#" target="_blank" rel="noopener"><span class="arrow-box"><i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>More on Instagram</a></p>
+    </section>
+
+    <section id="films" class="films" hidden>
+      <h2 data-split><em>Our</em> FILMS</h2>
+      <div class="film-grid" data-films data-reveal></div>
+    </section>
+
+    <section class="steps">
+      <h2 data-split><em>How it</em> WORKS</h2>
+      <ol data-reveal>
+        <li style="--i:0"><h3>Consultation</h3><p>A free 20-minute call, video call or studio visit. We confirm on WhatsApp.</p></li>
+        <li style="--i:1"><h3>Planning</h3><p>Mood board, locations, outfits and a clear quote for photos and film.</p></li>
+        <li style="--i:2"><h3>Delivery</h3><p>Edited photographs in an online gallery, and your wedding film.</p></li>
+      </ol>
+    </section>
+
+    <section id="about" class="about">
+      <div class="about-media" data-reveal-img><img data-parallax style="--speed:0.6" src="https://picsum.photos/seed/studio-about-team/900/1100" width="900" height="1100" alt="The MG Captures team at work" loading="lazy" /></div>
+      <div class="about-text" data-reveal>
+        <h2><em>Meet</em> MG CAPTURES</h2>
+        <p class="about-lead">Wedding photographers and filmmakers in Hisar and Chandigarh, founded by Mukul Gill.</p>
+        <p>We plan the details early, keep the day relaxed, and tell your story through both photographs and film.</p>
+        <div class="about-actions"><a class="btn" href="#book">Book consultation</a><a class="arrow-link" data-founder-ig href="#" target="_blank" rel="noopener"><span class="arrow-box"><i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>@founder</a></div>
+      </div>
+    </section>
+
+    <section id="praise" class="praise">
+      <h2 data-split><em>Client</em> PRAISE</h2>
+      <div class="quotes" data-reveal>
+        <!-- PLACEHOLDER REVIEWS: replace with real quotes from MG Captures couples (with their permission) before launch. -->
+        <blockquote style="--i:0"><p>“Client review goes here: two or three lines from a recent couple.”</p><cite>Couple name<span>Wedding, Hisar</span></cite></blockquote>
+        <blockquote style="--i:1"><p>“Second client review goes here, ideally about a pre-wedding shoot or film.”</p><cite>Couple name<span>Pre-wedding, Chandigarh</span></cite></blockquote>
+      </div>
+    </section>
+
+    <section id="book" class="book">
+      <div class="book-intro" data-reveal>
+        <p class="eyebrow">Free consultation</p>
+        <h2><em>Begin</em> YOUR STORY</h2>
+        <p>Four short steps. We reply on WhatsApp within a few hours.</p>
+        <a class="arrow-link" data-cal-link hidden href="#" target="_blank" rel="noopener"><span class="arrow-box"><i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>Or pick a slot on the live calendar</a>
+      </div>
+
+      <div class="book-panel" data-reveal>
+        <form id="booking-form" novalidate>
+          <ol class="progress" aria-label="Booking steps">
+            <li aria-current="step">About you</li><li>The shoot</li><li>Consultation</li><li>Review</li>
+          </ol>
+          <div class="progress-bar" aria-hidden="true"><span></span></div>
+
+          <fieldset class="step" data-step="0">
+            <legend tabindex="-1">About you</legend>
+            <div class="grid">
+              <label>Full name*<input name="name" autocomplete="name" required maxlength="80" /></label>
+              <label>WhatsApp number*<input name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" required /><small>With country code if outside India</small></label>
+              <label class="full">Email<input name="email" type="email" autocomplete="email" /><small>Optional, for the confirmation email</small></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="step" data-step="1" hidden>
+            <legend tabindex="-1">The shoot</legend>
+            <div class="chips" data-group="shootType">
+              <span class="chips-label">Shoot type*</span>
+              <label class="chip"><input type="radio" name="shootType" value="Wedding" /><span>Wedding</span></label>
+              <label class="chip"><input type="radio" name="shootType" value="Pre-wedding" /><span>Pre-wedding</span></label>
+              <label class="chip"><input type="radio" name="shootType" value="Wedding film" /><span>Wedding film</span></label>
+              <label class="chip"><input type="radio" name="shootType" value="Wedding photos + film" /><span>Photos + film</span></label>
+              <label class="chip"><input type="radio" name="shootType" value="Engagement / Roka" /><span>Engagement / Roka</span></label>
+              <label class="chip"><input type="radio" name="shootType" value="Other" /><span>Other</span></label>
+            </div>
+            <div class="grid">
+              <label>Event or shoot date<input name="eventDate" type="date" /></label>
+              <label>Location<input name="location" placeholder="City or venue" maxlength="120" /></label>
+            </div>
+            <div class="chips" data-group="budget">
+              <span class="chips-label">Budget</span>
+              <label class="chip"><input type="radio" name="budget" value="" checked /><span>Not sure yet</span></label>
+              <label class="chip"><input type="radio" name="budget" value="Under ₹50,000" /><span>Under ₹50k</span></label>
+              <label class="chip"><input type="radio" name="budget" value="₹50,000 - 1,00,000" /><span>₹50k - 1L</span></label>
+              <label class="chip"><input type="radio" name="budget" value="₹1,00,000 - 2,00,000" /><span>₹1L - 2L</span></label>
+              <label class="chip"><input type="radio" name="budget" value="Above ₹2,00,000" /><span>₹2L+</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="step" data-step="2" hidden>
+            <legend tabindex="-1">Consultation</legend>
+            <div class="chips" data-group="consultMode">
+              <span class="chips-label">Talk via</span>
+              <label class="chip"><input type="radio" name="consultMode" value="Phone call" checked /><span><i class="ph ph-phone" aria-hidden="true"></i> Phone call</span></label>
+              <label class="chip"><input type="radio" name="consultMode" value="Video call" /><span><i class="ph ph-video-camera" aria-hidden="true"></i> Video call</span></label>
+              <label class="chip"><input type="radio" name="consultMode" value="Studio visit" /><span><i class="ph ph-storefront" aria-hidden="true"></i> Studio visit</span></label>
+            </div>
+            <div class="grid">
+              <label>Preferred date*<input name="consultDate" type="date" required /></label>
+            </div>
+            <div class="chips" data-group="consultTime">
+              <span class="chips-label">Preferred time*</span>
+              <label class="chip"><input type="radio" name="consultTime" value="10 AM - 12 PM" /><span>10 AM - 12 PM</span></label>
+              <label class="chip"><input type="radio" name="consultTime" value="12 PM - 3 PM" /><span>12 PM - 3 PM</span></label>
+              <label class="chip"><input type="radio" name="consultTime" value="3 PM - 6 PM" /><span>3 PM - 6 PM</span></label>
+              <label class="chip"><input type="radio" name="consultTime" value="6 PM - 8 PM" /><span>6 PM - 8 PM</span></label>
+            </div>
+            <label class="full">Tell us about your story<textarea name="message" rows="3" maxlength="1000"></textarea></label>
+          </fieldset>
+
+          <fieldset class="step" data-step="3" hidden>
+            <legend tabindex="-1">Review</legend>
+            <dl class="summary" data-summary></dl>
+          </fieldset>
+
+          <label class="hp" aria-hidden="true">Leave empty<input name="company" tabindex="-1" autocomplete="off" /></label>
+          <p class="form-error" role="alert" hidden></p>
+
+          <div class="form-nav">
+            <button class="btn btn-ghost" type="button" data-back hidden><i class="ph ph-arrow-left" aria-hidden="true"></i> Back</button>
+            <button class="btn btn-dark" type="submit" data-next>Continue</button>
+          </div>
+          <p class="small">We only use your details to contact you about this booking.</p>
+        </form>
+
+        <div id="thanks" class="thanks" hidden tabindex="-1">
+          <i class="ph ph-check-circle thanks-icon" aria-hidden="true"></i>
+          <h3><em>Thank</em> YOU</h3>
+          <p>Your reference is <strong data-ref>MG-0000</strong>. We will confirm your consultation on WhatsApp shortly.</p>
+          <a class="btn btn-dark" data-wa-thanks href="#" target="_blank" rel="noopener"><i class="ph ph-whatsapp-logo" aria-hidden="true"></i> Message us on WhatsApp</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2 data-split><em>Good</em> TO KNOW</h2>
+      <div data-reveal>
+        <details><summary>Is the consultation really free?</summary><p>Yes. It is a 20-minute conversation to understand what you want and share a quote. No obligation.</p></details>
+        <details><summary>How do I confirm a booking?</summary><p>After the consultation we send a quote. An advance confirms your wedding date.</p></details>
+        <details><summary>Do you shoot outside Hisar and Chandigarh?</summary><p>Yes. Tell us the venue and we include travel and stay in the quote.</p></details>
+        <details><summary>Do you do both photos and films?</summary><p>Yes. Book photography, a wedding film, or both together.</p></details>
+      </div>
+    </section>
+
+    <section class="band">
+      <img src="https://picsum.photos/seed/studio-closing-band/1800/900" width="1800" height="900" alt="" loading="lazy" />
+      <div class="band-copy" data-reveal>
+        <p class="band-quote">Every laugh, every glance, every quiet moment, <em>kept for the years ahead</em>.</p>
+        <a class="btn btn-light" href="#book">Book consultation</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="eyebrow">Weddings and films</p>
+    <h2>Follow Along</h2>
+    <div class="footer-cols">
+      <nav aria-label="Footer"><a href="#top">Home</a><a href="#services">Services</a><a href="#work">Work</a><a href="#about">About</a></nav>
+      <nav aria-label="Footer more"><a href="#praise">Praise</a><a href="#faq">FAQ</a><a href="#book">Book consultation</a><a data-wa-link href="#">WhatsApp</a></nav>
+    </div>
+    <p><a class="footer-ig" data-studio-ig href="#">@studio</a></p>
+    <address class="footer-contact">
+      <a data-studio-tel href="#"><i class="ph ph-phone" aria-hidden="true"></i> <span data-studio="phone">Phone</span></a>
+      <a data-studio-map href="#" target="_blank" rel="noopener"><i class="ph ph-map-pin" aria-hidden="true"></i> <span data-studio="address">Address</span></a>
+    </address>
+    <div class="copyright">
+      <span>© <span data-year></span> <span data-studio="name">Studio</span>, <span data-studio="city">City</span></span>
+      <a data-studio-mail href="#">Email us</a>
+    </div>
+  </footer>
+
+  <a class="wa-float" data-wa-link href="#" aria-label="Chat on WhatsApp"><i class="ph ph-whatsapp-logo" aria-hidden="true"></i></a>
+
+  <div class="mobile-bar">
+    <a class="btn btn-dark" href="#book">Book consultation</a>
+    <a class="mobile-wa" data-wa-link href="#" aria-label="Chat on WhatsApp"><i class="ph ph-whatsapp-logo" aria-hidden="true"></i></a>
+  </div>
+
+  <dialog class="lightbox" aria-label="Photo viewer">
+    <img alt="" />
+    <button class="lb-close" type="button" aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button>
+    <button class="lb-prev" type="button" aria-label="Previous photo"><i class="ph ph-caret-left" aria-hidden="true"></i></button>
+    <button class="lb-next" type="button" aria-label="Next photo"><i class="ph ph-caret-right" aria-hidden="true"></i></button>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
