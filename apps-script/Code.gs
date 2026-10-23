@@ -116,9 +116,10 @@ function setup() {
 
 function testNotifications() {
   var url = SpreadsheetApp.getActive().getUrl();
-  console.log('WhatsApp: ' + (sendWhatsApp_('✅ ' + STUDIO_NAME + ': WhatsApp alerts are working.\nSheet: ' + url) ? 'OK' : 'FAILED'));
-  console.log('Push: ' + (sendPush_({ title: STUDIO_NAME + ' alerts are working', message: 'Tap to open the leads sheet.',
-    priority: 3, click: url }) ? 'OK' : 'FAILED'));
+  var wa = sendWhatsApp_('✅ ' + STUDIO_NAME + ': WhatsApp alerts are working.\nSheet: ' + url);
+  var push = sendPush_({ title: STUDIO_NAME + ' alerts are working', message: 'Tap to open the leads sheet.', priority: 3, click: url });
+  console.log('WhatsApp: ' + (wa === null ? 'not set up (fill OWNER_WHATSAPP and CALLMEBOT_APIKEY)' : channelStatus_(wa)));
+  console.log('Push: ' + (push === null ? 'not set up (fill NTFY_TOPIC)' : channelStatus_(push)));
 }
 
 // ---- Triggers -----------------------------------------------------------------------
@@ -226,8 +227,14 @@ function notifyNewLead_(row) {
   var c = colIndex_();
   var wa = sendWhatsApp_(leadWhatsAppText_(lead, sheet, row));
   var push = sendPush_(leadPush_(lead, sheet, row));
-  sheet.getRange(row, c['WA Sent'] + 1, 1, 2).setValues([[wa ? 'OK' : 'FAILED', push ? 'OK' : 'FAILED']]);
-  if (!wa || !push) scheduleRetry_();
+  sheet.getRange(row, c['WA Sent'] + 1, 1, 2).setValues([[channelStatus_(wa), channelStatus_(push)]]);
+  // Only real failures are retried; a channel that is not set up yet is recorded as OFF.
+  if (wa === false || push === false) scheduleRetry_();
+}
+
+function channelStatus_(result) {
+  if (result === null) return 'OFF';
+  return result ? 'OK' : 'FAILED';
 }
 
 function leadWhatsAppText_(lead, sheet, row) {
@@ -313,7 +320,7 @@ function fromCalcom_(p, event) {
 // ---- Channels -----------------------------------------------------------------------
 
 function sendWhatsApp_(text) {
-  if (!OWNER_WHATSAPP || !CALLMEBOT_APIKEY) return false;
+  if (!OWNER_WHATSAPP || !CALLMEBOT_APIKEY) return null; // not set up yet
   try {
     var res = UrlFetchApp.fetch('https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(OWNER_WHATSAPP) +
       '&text=' + encodeURIComponent(text) + '&apikey=' + encodeURIComponent(CALLMEBOT_APIKEY), { muteHttpExceptions: true });
@@ -327,7 +334,7 @@ function sendWhatsApp_(text) {
 }
 
 function sendPush_(msg) {
-  if (!NTFY_TOPIC) return false;
+  if (!NTFY_TOPIC) return null; // not set up yet
   var payload = { topic: NTFY_TOPIC };
   Object.keys(msg).forEach(function (k) { payload[k] = msg[k]; });
   var headers = NTFY_TOKEN ? { Authorization: 'Bearer ' + NTFY_TOKEN } : {};

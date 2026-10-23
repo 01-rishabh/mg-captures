@@ -12,7 +12,7 @@ window.STUDIO = {
   founderInstagram: 'gillmukul',
   address: 'DSS 50, Old Court Complex, Hisar, Haryana 125001',
   // Google Apps Script web app URL (README step 3). Empty = demo mode, nothing is sent.
-  endpoint: '',
+  endpoint: 'https://script.google.com/macros/s/AKfycbwPDKYfq0iVQIMgmHSQ6CeV8-e-VwoXaxcSm8xPRqCNB4dw0Bwxf9nkH0RVilFdjzHm/exec',
   // Optional Cal.com booking link, e.g. 'https://cal.com/mgcaptures/consultation'. Empty hides the button.
   calLink: '',
 
