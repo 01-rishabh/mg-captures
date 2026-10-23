@@ -43,8 +43,20 @@ var COLUMNS = ['Lead ID', 'Received', 'Status', 'Name', 'WhatsApp', 'Email', 'Sh
   'Location', 'Budget', 'Consult Via', 'Consult Date', 'Consult Time', 'Message', 'Source', 'Campaign',
   'WA Sent', 'Push Sent', 'Last Nudge', 'Notes'];
 var STATUSES = ['New', 'Contacted', 'Consultation', 'Quote sent', 'Booked', 'Delivered', 'Lost'];
-var STATUS_COLORS = { New: '#fde68a', Contacted: '#bfdbfe', Consultation: '#c7d2fe', 'Quote sent': '#e9d5ff',
-  Booked: '#bbf7d0', Delivered: '#d1d5db', Lost: '#fecaca' };
+// [background, text] per status, used for the coloured status cells.
+var STATUS_COLORS = {
+  New: ['#fef3c7', '#92400e'], Contacted: ['#dbeafe', '#1e40af'], Consultation: ['#e0e7ff', '#3730a3'],
+  'Quote sent': ['#f3e8ff', '#6b21a8'], Booked: ['#dcfce7', '#166534'], Delivered: ['#e5e7eb', '#374151'],
+  Lost: ['#fee2e2', '#991b1b'],
+};
+// Sheet look: the website's navy for headers, soft stone banding for rows.
+var THEME = { header: '#10132b', headerText: '#f1eee8', rowA: '#ffffff', rowB: '#f6f4f0', muted: '#8a8378', font: 'Roboto' };
+var COLUMN_WIDTHS = {
+  'Lead ID': 90, 'Received': 150, 'Status': 125, 'Name': 180, 'WhatsApp': 130, 'Email': 210, 'Shoot Type': 165,
+  'Event Date': 105, 'Location': 130, 'Budget': 150, 'Consult Via': 110, 'Consult Date': 110, 'Consult Time': 120,
+  'Message': 300, 'Source': 115, 'Campaign': 130, 'WA Sent': 80, 'Push Sent': 85, 'Last Nudge': 150, 'Notes': 260,
+};
+var OVERVIEW_NAME = 'Overview';
 var MAX_VALUE_LENGTH = 1000;
 
 // ---- Web app ------------------------------------------------------------------------
@@ -91,27 +103,124 @@ function doGet() {
 
 // ---- Run these from the Apps Script editor -------------------------------------------
 
-// Creates the sheet layout and the triggers, then sends a test alert to every channel.
+// Formats the sheets and creates the triggers, then sends a test alert to every channel.
 function setup() {
-  var sheet = getSheet_();
-  var header = sheet.getRange(1, 1, 1, COLUMNS.length);
-  header.setValues([COLUMNS]).setFontWeight('bold').setBackground('#f4f4f5');
-  sheet.setFrozenRows(1);
-  sheet.setFrozenColumns(1);
-
-  var statusCol = COLUMNS.indexOf('Status') + 1;
-  var statusRange = sheet.getRange(2, statusCol, sheet.getMaxRows() - 1, 1);
-  statusRange.setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build());
-  sheet.setConditionalFormatRules(STATUSES.map(function (s) {
-    return SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(s).setBackground(STATUS_COLORS[s])
-      .setRanges([statusRange]).build();
-  }));
+  formatSheet();
 
   ['onStatusEdit', 'nudgeStaleLeads'].forEach(deleteTriggers_);
   ScriptApp.newTrigger('onStatusEdit').forSpreadsheet(SpreadsheetApp.getActive()).onEdit().create();
   ScriptApp.newTrigger('nudgeStaleLeads').timeBased().everyMinutes(30).create();
 
   testNotifications();
+}
+
+// Styles the Leads tab and rebuilds the Overview tab. Safe to run again at any time: it never
+// changes lead data, and it puts the header row back if it was deleted.
+function formatSheet() {
+  var ss = SpreadsheetApp.getActive();
+  var sheet = getSheet_();
+  var cols = COLUMNS.length;
+
+  if (String(sheet.getRange(1, 1).getValue()) !== COLUMNS[0]) sheet.insertRowBefore(1);
+  if (sheet.getMaxColumns() < cols) sheet.insertColumnsAfter(sheet.getMaxColumns(), cols - sheet.getMaxColumns());
+  var rows = sheet.getMaxRows();
+  var body = sheet.getRange(2, 1, rows - 1, cols);
+
+  sheet.getRange(1, 1, 1, cols).setValues([COLUMNS]).setBackground(THEME.header).setFontColor(THEME.headerText)
+    .setFontWeight('bold').setFontSize(10).setVerticalAlignment('middle').setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+  sheet.setRowHeight(1, 40);
+  sheet.getRange(1, 1, rows, cols).setFontFamily(THEME.font);
+  body.setFontSize(10).setVerticalAlignment('middle').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  sheet.setRowHeightsForced(2, rows - 1, 30);
+  sheet.setFrozenRows(1);
+  sheet.setFrozenColumns(1);
+  sheet.setTabColor(THEME.header);
+
+  COLUMNS.forEach(function (h, i) { sheet.setColumnWidth(i + 1, COLUMN_WIDTHS[h] || 120); });
+  var c = colIndex_();
+  function col(name) { return sheet.getRange(2, c[name] + 1, rows - 1, 1); }
+  col('Lead ID').setFontWeight('bold');
+  col('Received').setNumberFormat('dd mmm yyyy, h:mm AM/PM');
+  col('Last Nudge').setNumberFormat('dd mmm, h:mm AM/PM');
+  col('WhatsApp').setNumberFormat('@');
+  ['Status', 'WA Sent', 'Push Sent'].forEach(function (name) { col(name).setHorizontalAlignment('center'); });
+  ['Source', 'Campaign', 'WA Sent', 'Push Sent', 'Last Nudge'].forEach(function (name) { col(name).setFontColor(THEME.muted); });
+
+  // Alternating rows across the whole sheet, so new leads pick up the style automatically.
+  sheet.getBandings().forEach(function (b) { b.remove(); });
+  sheet.getRange(1, 1, rows, cols).applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, true, false)
+    .setHeaderRowColor(THEME.header).setFirstRowColor(THEME.rowA).setSecondRowColor(THEME.rowB);
+
+  var statusRange = col('Status');
+  statusRange.setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).setAllowInvalid(false).build());
+  var rules = STATUSES.map(function (s) {
+    return SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(s).setBackground(STATUS_COLORS[s][0])
+      .setFontColor(STATUS_COLORS[s][1]).setBold(true).setRanges([statusRange]).build();
+  });
+  var alertCols = sheet.getRange(2, c['WA Sent'] + 1, rows - 1, 2);
+  [['OK', '#166534'], ['OK (retry)', '#166534'], ['FAILED', '#b42318'], ['FAILED (retry)', '#b42318']].forEach(function (r) {
+    rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(r[0]).setFontColor(r[1]).setBold(true)
+      .setRanges([alertCols]).build());
+  });
+  sheet.setConditionalFormatRules(rules);
+
+  // Filter buttons on every header, for sorting by date or filtering by status or source.
+  if (sheet.getFilter()) sheet.getFilter().remove();
+  sheet.getRange(1, 1, rows, cols).createFilter();
+
+  buildOverview_(ss, sheet);
+}
+
+// A one-glance summary tab built from formulas, so it stays live as leads arrive.
+function buildOverview_(ss, leads) {
+  var o = ss.getSheetByName(OVERVIEW_NAME) || ss.insertSheet(OVERVIEW_NAME, 0);
+  o.clear();
+  o.getBandings().forEach(function (b) { b.remove(); });
+  o.setHiddenGridlines(true);
+  o.setTabColor('#c9a227');
+  var L = "'" + leads.getName() + "'!";
+  function colRef(name) { var n = COLUMNS.indexOf(name) + 1; var a = columnLetter_(n); return L + a + '2:' + a; }
+
+  o.getRange('A1:H40').setFontFamily(THEME.font).setFontColor('#3d362c').setVerticalAlignment('middle');
+  o.setColumnWidth(1, 24);
+  [2, 3, 4, 5, 6, 7].forEach(function (n) { o.setColumnWidth(n, 170); });
+  o.getRange('B2').setValue(STUDIO_NAME + ' leads').setFontSize(20).setFontWeight('bold').setFontColor(THEME.header);
+  o.getRange('B3').setFormula('="Updated " & TEXT(NOW(), "d mmm yyyy, h:mm AM/PM")').setFontColor(THEME.muted);
+
+  var kpis = [
+    ['Total leads', '=COUNTA(' + colRef('Lead ID') + ')'],
+    ['Still new', '=COUNTIF(' + colRef('Status') + ', "New")'],
+    ['This month', '=COUNTIFS(' + colRef('Received') + ', ">=" & EOMONTH(TODAY(), -1) + 1)'],
+    ['Booked', '=COUNTIF(' + colRef('Status') + ', "Booked")'],
+    ['Booking rate', '=IFERROR(COUNTIF(' + colRef('Status') + ', "Booked") / COUNTA(' + colRef('Lead ID') + '), 0)'],
+  ];
+  kpis.forEach(function (k, i) {
+    var cell = o.getRange(5, i + 2, 2, 1);
+    cell.setBackground('#f6f4f0');
+    o.getRange(5, i + 2).setValue(k[0]).setFontSize(9).setFontColor(THEME.muted).setFontWeight('bold');
+    o.getRange(6, i + 2).setFormula(k[1]).setFontSize(22).setFontWeight('bold').setFontColor(THEME.header)
+      .setNumberFormat(k[0] === 'Booking rate' ? '0%' : '0');
+  });
+  o.setRowHeight(5, 26);
+  o.setRowHeight(6, 44);
+
+  function table(row, colNum, title, sourceName) {
+    var letter = columnLetter_(COLUMNS.indexOf(sourceName) + 1);
+    o.getRange(row, colNum, 1, 2).setValues([[title, 'Leads']]).setBackground(THEME.header).setFontColor(THEME.headerText)
+      .setFontWeight('bold').setFontSize(9);
+    o.getRange(row + 1, colNum).setFormula('=IFERROR(QUERY(' + L + letter + '2:' + letter + ', "select ' + letter +
+      ', count(' + letter + ') where ' + letter + " is not null group by " + letter + ' order by count(' + letter +
+      ') desc label count(' + letter + ") ''\", 0), \"No leads yet\")");
+  }
+  table(9, 2, 'Status', 'Status');
+  table(9, 4, 'Source', 'Source');
+  table(9, 6, 'Shoot type', 'Shoot Type');
+}
+
+function columnLetter_(n) {
+  var s = '';
+  while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); }
+  return s;
 }
 
 function testNotifications() {
