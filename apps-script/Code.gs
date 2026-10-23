@@ -209,7 +209,7 @@ function buildOverview_(ss, leads) {
     o.getRange(row, colNum, 1, 2).setValues([[title, 'Leads']]).setBackground(THEME.header).setFontColor(THEME.headerText)
       .setFontWeight('bold').setFontSize(9);
     o.getRange(row + 1, colNum).setFormula('=IFERROR(QUERY(' + L + letter + '2:' + letter + ', "select ' + letter +
-      ', count(' + letter + ') where ' + letter + " is not null group by " + letter + ' order by count(' + letter +
+      ', count(' + letter + ') where ' + letter + " <> '' group by " + letter + ' order by count(' + letter +
       ') desc label count(' + letter + ") ''\", 0), \"No leads yet\")");
   }
   table(9, 2, 'Status', 'Status');
