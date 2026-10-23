@@ -57,9 +57,15 @@
     </section>
 
     <section class="manifesto" aria-label="About our approach">
-      <img class="m-img m-img-1" data-parallax style="--speed:1.2" src="https://picsum.photos/seed/studio-manifesto-couple/700/900" width="700" height="900" alt="" loading="lazy" />
-      <img class="m-img m-img-2" data-parallax style="--speed:-0.9" src="https://picsum.photos/seed/studio-manifesto-detail/700/900" width="700" height="900" alt="" loading="lazy" />
-      <p class="manifesto-text" data-split>Every photograph begins <em>with a conversation.</em></p>
+      <div class="m-copy">
+        <p class="manifesto-text" data-split>Every photograph begins <em>with a conversation.</em></p>
+        <p class="manifesto-sub" data-reveal>Before your wedding day, we sit down with you to plan the moments, the light and the people who matter most.</p>
+        <a class="arrow-link arrow-link-light" href="#process" data-reveal><span class="arrow-box"><i class="ph ph-arrow-down" aria-hidden="true"></i></span>See how it works</a>
+      </div>
+      <img class="m-img m-img-1" data-parallax style="--speed:1.1" src="https://picsum.photos/seed/mg-manifesto-couple/800/1000" width="800" height="1000" alt="" loading="lazy" />
+      <img class="m-img m-img-2" data-parallax style="--speed:-0.5" src="https://picsum.photos/seed/mg-manifesto-hands/600/600" width="600" height="600" alt="" loading="lazy" />
+      <img class="m-img m-img-3" data-parallax style="--speed:0.7" src="https://picsum.photos/seed/mg-manifesto-veil/600/800" width="600" height="800" alt="" loading="lazy" />
+      <img class="m-img m-img-4" data-parallax style="--speed:-1.2" src="https://picsum.photos/seed/mg-manifesto-venue/900/675" width="900" height="675" alt="" loading="lazy" />
     </section>
 
     <section id="services" class="services">
@@ -112,7 +118,7 @@
       <div class="film-grid" data-films data-reveal></div>
     </section>
 
-    <section class="steps">
+    <section id="process" class="steps">
       <h2 data-split><em>How it</em> WORKS</h2>
       <ol data-reveal>
         <li style="--i:0"><h3>Consultation</h3><p>A free 20-minute call, video call or studio visit. We confirm on WhatsApp.</p></li>
@@ -215,7 +221,9 @@
             <dl class="summary" data-summary></dl>
           </fieldset>
 
-          <label class="hp" aria-hidden="true">Leave empty<input name="company" tabindex="-1" autocomplete="off" /></label>
+          <!-- Anti-spam trap: bots fill every field, people never see this one. The name is deliberately
+               meaningless so browser autofill (which fills "company", "email", etc.) leaves it empty. -->
+          <label class="hp" aria-hidden="true">Leave empty<input name="hpx_mg" type="text" tabindex="-1" autocomplete="off" data-lpignore="true" data-1p-ignore /></label>
           <p class="form-error" role="alert" hidden></p>
 
           <div class="form-nav">
@@ -228,7 +236,7 @@
         <div id="thanks" class="thanks" hidden tabindex="-1">
           <i class="ph ph-check-circle thanks-icon" aria-hidden="true"></i>
           <h3><em>Thank</em> YOU</h3>
-          <p>Your reference is <strong data-ref>MG-0000</strong>. We will confirm your consultation on WhatsApp shortly.</p>
+          <p><span data-ref-line>Your reference is <strong data-ref>MG-0000</strong>. </span>We will confirm your consultation on WhatsApp shortly.</p>
           <a class="btn btn-dark" data-wa-thanks href="#" target="_blank" rel="noopener"><i class="ph ph-whatsapp-logo" aria-hidden="true"></i> Message us on WhatsApp</a>
         </div>
       </div>

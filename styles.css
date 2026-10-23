@@ -111,12 +111,19 @@ body::after { content: ''; position: fixed; inset: 0; z-index: 60; pointer-event
 .hero-sub { font-size: 16px; margin: 0 0 32px; }
 
 /* Statement over two drifting photographs */
-.manifesto { position: relative; min-height: 130vh; display: grid; place-items: center; background: var(--panel); color: var(--on-panel); overflow: hidden; }
-.m-img { position: absolute; width: clamp(180px, 26vw, 380px); height: auto; aspect-ratio: 7 / 9; object-fit: cover; }
-.m-img-1 { left: 7vw; top: 10%; }
-.m-img-2 { right: 7vw; bottom: 8%; }
-.manifesto-text { position: relative; z-index: 1; margin: 0; padding: 0 var(--gutter); max-width: 14em; text-align: center;
-  font: 400 clamp(2.2rem, 5.6vw, 4.6rem)/1.12 var(--serif); text-shadow: 0 2px 30px rgb(10 12 30 / .5); }
+/* Statement framed by a four-photo collage; each photo drifts at its own speed. */
+.manifesto { position: relative; min-height: 105vh; min-height: 105dvh; display: grid; place-items: center;
+  padding: 14vh var(--gutter); background: var(--panel); color: var(--on-panel); overflow: hidden; }
+.m-copy { position: relative; z-index: 1; max-width: min(640px, 48vw); text-align: center; display: flex; flex-direction: column; align-items: center; }
+.manifesto-text { margin: 0 0 28px; font: 400 clamp(2.2rem, 4.8vw, 4.2rem)/1.12 var(--serif); text-shadow: 0 2px 30px rgb(10 12 30 / .6); }
+.manifesto-sub { margin: 0 0 32px; max-width: 34em; font-size: 16px; line-height: 1.7; color: rgb(241 238 232 / .78); }
+.m-img { position: absolute; height: auto; object-fit: cover; filter: grayscale(1) contrast(1.05) brightness(.9); }
+.m-img-1 { left: 5vw; top: 9%; width: clamp(180px, 19vw, 300px); aspect-ratio: 4 / 5; }
+.m-img-2 { left: 11vw; bottom: 8%; width: clamp(120px, 11vw, 180px); aspect-ratio: 1; }
+.m-img-3 { right: 13vw; top: 7%; width: clamp(120px, 12vw, 200px); aspect-ratio: 3 / 4; }
+.m-img-4 { right: 4vw; bottom: 11%; width: clamp(200px, 21vw, 340px); aspect-ratio: 4 / 3; }
+.arrow-link-light .arrow-box { border-color: rgb(241 238 232 / .35); }
+.arrow-link-light:hover .arrow-box { background: var(--on-panel); border-color: var(--on-panel); color: var(--panel); }
 
 /* Small image floating beside a section heading */
 .float-img { width: clamp(160px, 20vw, 280px); justify-self: end; margin-top: -40px; }
@@ -364,13 +371,21 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 /* Layout collapse */
+/* Statement section: below 1100px the collage no longer clears the text, so the statement
+   sits on top and the photos form a staggered row (4 across), then a 2x2 grid on phones. */
+@media (max-width: 1100px) {
+  .manifesto { min-height: 0; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 96px var(--gutter) 80px; place-items: stretch; }
+  .m-copy { grid-column: 1 / -1; justify-self: center; margin-bottom: 48px; max-width: 640px; }
+  .m-img, .m-img-1, .m-img-2, .m-img-3, .m-img-4 { position: static; width: 100%; aspect-ratio: 4 / 5; }
+  .m-img-2, .m-img-4 { margin-top: 40px; }
+}
+@media (max-width: 600px) {
+  .manifesto { grid-template-columns: 1fr 1fr; gap: 10px; padding: 88px 16px 72px; }
+  .m-copy { margin-bottom: 40px; }
+}
 @media (max-width: 900px) {
   .header-book { display: none; }
   .menu-toggle [data-menu-label] { display: none; }
-  .manifesto { min-height: 100vh; }
-  .m-img { width: 42vw; }
-  .m-img-1 { left: 4vw; top: 6%; }
-  .m-img-2 { right: 4vw; bottom: 6%; }
   .services-head { grid-template-columns: 1fr; }
   .float-img { display: none; }
   .about, .book, .quotes, .film-grid[data-count] { grid-template-columns: 1fr; }

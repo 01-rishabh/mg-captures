@@ -484,10 +484,16 @@
     nextButton.disabled = true;
     nextButton.textContent = 'Sending…';
 
-    send(lead, form.company.value)
-      .then(function (res) { showThanks(res.leadId, lead); })
+    // The trap value travels with the lead instead of blocking it here: autofill and password
+    // managers can fill hidden fields, and a dropped request is a lost real client.
+    lead.trap = form.elements.hpx_mg.value;
+    send(lead)
+      .then(function (res) {
+        console.info('[Booking] Saved to the sheet as ' + res.leadId);
+        showThanks(res.leadId, lead);
+      })
       .catch(function (err) {
-        console.error(err);
+        console.error('[Booking] Not saved:', err);
         errorBox.textContent = 'Could not send right now. Please message us on WhatsApp instead.';
         errorBox.hidden = false;
       })
@@ -498,8 +504,7 @@
   });
 
   // text/plain keeps this a simple CORS request, which Apps Script can answer.
-  function send(lead, honeypot) {
-    if (honeypot) return Promise.resolve({ ok: true, leadId: '' });
+  function send(lead) {
     if (!S.endpoint) {
       console.info('[Demo mode] endpoint is empty in config.js. Lead:', lead);
       return new Promise(function (resolve) { setTimeout(function () { resolve({ ok: true, leadId: 'DEMO-0001' }); }, 800); });
@@ -510,12 +515,16 @@
       body: JSON.stringify({ type: 'lead', data: lead }),
     })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (body) { if (!body.ok) throw new Error(body.error || 'Rejected'); return body; });
+      .then(function (body) {
+        if (!body.ok || !body.leadId) throw new Error(body.error || 'The sheet did not return a reference');
+        return body;
+      });
   }
 
   function showThanks(leadId, lead) {
     var thanks = document.getElementById('thanks');
-    thanks.querySelector('[data-ref]').textContent = leadId || 'received';
+    thanks.querySelector('[data-ref]').textContent = leadId || '';
+    thanks.querySelector('[data-ref-line]').hidden = !leadId;
     thanks.querySelector('[data-wa-thanks]').href = waUrl(
       'Hi, I just requested a ' + lead.shootType + ' consultation' + (leadId ? ' (ref ' + leadId + ')' : '') +
       ' for ' + prettyDate(lead.consultDate) + ', ' + lead.consultTime + '. My name is ' + lead.name + '.'

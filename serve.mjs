@@ -12,7 +12,8 @@ createServer(async (req, res) => {
   const file = join(root, path.endsWith('/') || path.endsWith('\\') ? 'index.html' : path)
   try {
     const body = await readFile(file)
-    res.writeHead(200, { 'Content-Type': (types[extname(file)] || 'application/octet-stream') + '; charset=utf-8' })
+    // no-store: while editing, a normal refresh must always load the latest files.
+    res.writeHead(200, { 'Content-Type': (types[extname(file)] || 'application/octet-stream') + '; charset=utf-8', 'Cache-Control': 'no-store' })
     res.end(body)
   } catch {
     res.writeHead(404).end('Not found')
