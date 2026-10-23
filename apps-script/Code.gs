@@ -10,6 +10,8 @@
 // ---- Settings -----------------------------------------------------------------------
 
 var STUDIO_NAME = 'MG Captures';
+// Changes with every code update. The web app reports it, so a deploy can be checked from outside.
+var SCRIPT_VERSION = '2026-10-24.3';
 
 // Owner's WhatsApp number with country code, e.g. '+919876543210'.
 var OWNER_WHATSAPP = '';
@@ -97,11 +99,23 @@ function doPost(e) {
 }
 
 // Opening the web app URL in a browser shows this, which confirms the deployment works.
+// It reports which code version is deployed and which alerts are on, never the settings themselves.
 function doGet() {
-  return json_({ ok: true, message: STUDIO_NAME + ' booking endpoint is running.' });
+  return json_({ ok: true, message: STUDIO_NAME + ' booking endpoint is running.', version: SCRIPT_VERSION,
+    push: NTFY_TOPIC ? 'on' : 'off', whatsapp: OWNER_WHATSAPP && CALLMEBOT_APIKEY ? 'on' : 'off' });
 }
 
-// ---- Run these from the Apps Script editor -------------------------------------------
+// ---- Sheet menu and editor functions ---------------------------------------------------
+
+// Runs automatically when the Sheet opens: adds an "MG Captures" menu next to Help.
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu(STUDIO_NAME)
+    .addItem('Format sheet', 'formatSheet')
+    .addItem('Send test notification', 'testNotifications')
+    .addSeparator()
+    .addItem('Full setup (format, reminders, test)', 'setup')
+    .addToUi();
+}
 
 // Formats the sheets and creates the triggers, then sends a test alert to every channel.
 function setup() {
@@ -169,6 +183,7 @@ function formatSheet() {
   sheet.getRange(1, 1, rows, cols).createFilter();
 
   buildOverview_(ss, sheet);
+  toast_('Leads sheet styled and Overview tab updated.', 'Format sheet');
 }
 
 // A one-glance summary tab built from formulas, so it stays live as leads arrive.
@@ -227,8 +242,16 @@ function testNotifications() {
   var url = SpreadsheetApp.getActive().getUrl();
   var wa = sendWhatsApp_('✅ ' + STUDIO_NAME + ': WhatsApp alerts are working.\nSheet: ' + url);
   var push = sendPush_({ title: STUDIO_NAME + ' alerts are working', message: 'Tap to open the leads sheet.', priority: 3, click: url });
-  console.log('WhatsApp: ' + (wa === null ? 'not set up (fill OWNER_WHATSAPP and CALLMEBOT_APIKEY)' : channelStatus_(wa)));
-  console.log('Push: ' + (push === null ? 'not set up (fill NTFY_TOPIC)' : channelStatus_(push)));
+  var waText = 'WhatsApp: ' + (wa === null ? 'not set up (fill OWNER_WHATSAPP and CALLMEBOT_APIKEY)' : channelStatus_(wa));
+  var pushText = 'Push: ' + (push === null ? 'not set up (fill NTFY_TOPIC)' : channelStatus_(push));
+  console.log(waText);
+  console.log(pushText);
+  toast_(pushText + '\n' + waText, 'Test notification');
+}
+
+// Small pop-up in the bottom-right corner of the Sheet, so results show without the editor's log.
+function toast_(message, title) {
+  try { SpreadsheetApp.getActive().toast(message, STUDIO_NAME + ': ' + title, 15); } catch (err) { /* no Sheet open */ }
 }
 
 // ---- Triggers -----------------------------------------------------------------------
