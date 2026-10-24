@@ -11,7 +11,7 @@
 
 var STUDIO_NAME = 'MG Captures';
 // Changes with every code update. The web app reports it, so a deploy can be checked from outside.
-var SCRIPT_VERSION = '2026-10-24.4';
+var SCRIPT_VERSION = '2026-10-24.5';
 
 // Owner's WhatsApp number with country code, e.g. '+919876543210'.
 var OWNER_WHATSAPP = '';
@@ -45,7 +45,7 @@ var CAL_WEBHOOK_KEY = '';
 var SHEET_NAME = 'Leads';
 var COLUMNS = ['Lead ID', 'Received', 'Status', 'Name', 'WhatsApp', 'Email', 'Shoot Type', 'Event Date',
   'Location', 'Budget', 'Consult Via', 'Consult Date', 'Consult Time', 'Message', 'Source', 'Campaign',
-  'WA Sent', 'Push Sent', 'Last Nudge', 'Notes'];
+  'WA Sent', 'Last Nudge', 'Notes'];
 var STATUSES = ['New', 'Contacted', 'Consultation', 'Quote sent', 'Booked', 'Delivered', 'Lost'];
 // [background, text] per status, used for the coloured status cells.
 var STATUS_COLORS = {
@@ -58,7 +58,7 @@ var THEME = { header: '#10132b', headerText: '#f1eee8', rowA: '#ffffff', rowB: '
 var COLUMN_WIDTHS = {
   'Lead ID': 90, 'Received': 150, 'Status': 125, 'Name': 180, 'WhatsApp': 130, 'Email': 210, 'Shoot Type': 165,
   'Event Date': 105, 'Location': 130, 'Budget': 150, 'Consult Via': 110, 'Consult Date': 110, 'Consult Time': 120,
-  'Message': 300, 'Source': 115, 'Campaign': 130, 'WA Sent': 80, 'Push Sent': 85, 'Last Nudge': 150, 'Notes': 260,
+  'Message': 300, 'Source': 115, 'Campaign': 130, 'WA Sent': 80, 'Last Nudge': 150, 'Notes': 260,
 };
 var OVERVIEW_NAME = 'Overview';
 var MAX_VALUE_LENGTH = 1000;
@@ -140,6 +140,7 @@ function formatSheet() {
   var cols = COLUMNS.length;
 
   if (String(sheet.getRange(1, 1).getValue()) !== COLUMNS[0]) sheet.insertRowBefore(1);
+  removeRetiredColumns_(sheet);
   if (sheet.getMaxColumns() < cols) sheet.insertColumnsAfter(sheet.getMaxColumns(), cols - sheet.getMaxColumns());
   var rows = sheet.getMaxRows();
   var body = sheet.getRange(2, 1, rows - 1, cols);
@@ -161,8 +162,8 @@ function formatSheet() {
   col('Received').setNumberFormat('dd mmm yyyy, h:mm AM/PM');
   col('Last Nudge').setNumberFormat('dd mmm, h:mm AM/PM');
   col('WhatsApp').setNumberFormat('@');
-  ['Status', 'WA Sent', 'Push Sent'].forEach(function (name) { col(name).setHorizontalAlignment('center'); });
-  ['Source', 'Campaign', 'WA Sent', 'Push Sent', 'Last Nudge'].forEach(function (name) { col(name).setFontColor(THEME.muted); });
+  ['Status', 'WA Sent'].forEach(function (name) { col(name).setHorizontalAlignment('center'); });
+  ['Source', 'Campaign', 'WA Sent', 'Last Nudge'].forEach(function (name) { col(name).setFontColor(THEME.muted); });
 
   // Alternating rows across the whole sheet, so new leads pick up the style automatically.
   sheet.getBandings().forEach(function (b) { b.remove(); });
@@ -175,7 +176,7 @@ function formatSheet() {
     return SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(s).setBackground(STATUS_COLORS[s][0])
       .setFontColor(STATUS_COLORS[s][1]).setBold(true).setRanges([statusRange]).build();
   });
-  var alertCols = sheet.getRange(2, c['WA Sent'] + 1, rows - 1, 2);
+  var alertCols = sheet.getRange(2, c['WA Sent'] + 1, rows - 1, 1);
   [['OK', '#166534'], ['OK (retry)', '#166534'], ['FAILED', '#b42318'], ['FAILED (retry)', '#b42318']].forEach(function (r) {
     rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(r[0]).setFontColor(r[1]).setBold(true)
       .setRanges([alertCols]).build());
@@ -198,6 +199,18 @@ function ensureFormatted_() {
   if (headerOk && props.getProperty('formattedVersion') === SCRIPT_VERSION) return;
   formatSheet();
   props.setProperty('formattedVersion', SCRIPT_VERSION);
+}
+
+// Columns dropped from the layout are deleted from the sheet (with their old values), so the
+// remaining data lines up with the current headers again.
+var RETIRED_COLUMNS = ['Push Sent'];
+function removeRetiredColumns_(sheet) {
+  var lastCol = sheet.getLastColumn();
+  if (lastCol < 1) return;
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(String);
+  for (var i = headers.length - 1; i >= 0; i--) {
+    if (RETIRED_COLUMNS.indexOf(headers[i]) !== -1) sheet.deleteColumn(i + 1);
+  }
 }
 
 // A one-glance summary tab built from formulas, so it stays live as leads arrive.
@@ -315,7 +328,7 @@ function nudgeStaleLeads() {
   });
 }
 
-// One-off trigger scheduled when a WhatsApp or push alert fails: tries those once more.
+// One-off trigger scheduled when a WhatsApp alert fails: tries it once more.
 function retryFailedNotifications() {
   deleteTriggers_('retryFailedNotifications');
   var sheet = getSheet_();
@@ -325,16 +338,9 @@ function retryFailedNotifications() {
   var values = sheet.getRange(2, 1, last - 1, COLUMNS.length).getValues();
   values.forEach(function (v, i) {
     var row = i + 2;
-    if (v[c['WA Sent']] !== 'FAILED' && v[c['Push Sent']] !== 'FAILED') return;
-    var lead = readRow_(sheet, row);
-    if (v[c['WA Sent']] === 'FAILED') {
-      var wa = sendWhatsApp_(leadWhatsAppText_(lead, sheet, row));
-      sheet.getRange(row, c['WA Sent'] + 1).setValue(wa ? 'OK (retry)' : 'FAILED (retry)');
-    }
-    if (v[c['Push Sent']] === 'FAILED') {
-      var push = sendPush_(leadPush_(lead, sheet, row));
-      sheet.getRange(row, c['Push Sent'] + 1).setValue(push ? 'OK (retry)' : 'FAILED (retry)');
-    }
+    if (v[c['WA Sent']] !== 'FAILED') return;
+    var wa = sendWhatsApp_(leadWhatsAppText_(readRow_(sheet, row), sheet, row));
+    sheet.getRange(row, c['WA Sent'] + 1).setValue(wa ? 'OK (retry)' : 'FAILED (retry)');
   });
 }
 
@@ -371,11 +377,11 @@ function notifyNewLead_(row) {
   var sheet = getSheet_();
   var lead = readRow_(sheet, row);
   var c = colIndex_();
+  // New leads alert by WhatsApp and email only; push is used for status changes and reminders.
   var wa = sendWhatsApp_(leadWhatsAppText_(lead, sheet, row));
-  var push = sendPush_(leadPush_(lead, sheet, row));
-  sheet.getRange(row, c['WA Sent'] + 1, 1, 2).setValues([[channelStatus_(wa), channelStatus_(push)]]);
+  sheet.getRange(row, c['WA Sent'] + 1).setValue(channelStatus_(wa));
   // Only real failures are retried; a channel that is not set up yet is recorded as OFF.
-  if (wa === false || push === false) scheduleRetry_();
+  if (wa === false) scheduleRetry_();
 }
 
 function channelStatus_(result) {
@@ -397,18 +403,6 @@ function leadWhatsAppText_(lead, sheet, row) {
     lead['WhatsApp'] ? 'Chat: https://wa.me/' + lead['WhatsApp'] : null,
     'Sheet: ' + rowUrl_(sheet, row),
   ].filter(function (line) { return line !== null; }).join('\n');
-}
-
-function leadPush_(lead, sheet, row) {
-  return {
-    title: 'New lead ' + lead['Lead ID'] + ' · ' + lead['Shoot Type'],
-    message: lead['Name'] + '\nConsultation: ' + [lead['Consult Date'], lead['Consult Time']].filter(String).join(', ') +
-      '\nBudget: ' + (lead['Budget'] || 'Not sure') + ' · Source: ' + lead['Source'],
-    priority: 5,
-    tags: ['camera'],
-    click: rowUrl_(sheet, row),
-    actions: leadActions_(lead, sheet, row),
-  };
 }
 
 // ntfy allows three buttons per notification.
