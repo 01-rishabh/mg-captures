@@ -11,7 +11,7 @@
 
 var STUDIO_NAME = 'MG Captures';
 // Changes with every code update. The web app reports it, so a deploy can be checked from outside.
-var SCRIPT_VERSION = '2026-10-24.3';
+var SCRIPT_VERSION = '2026-10-24.4';
 
 // Owner's WhatsApp number with country code, e.g. '+919876543210'.
 var OWNER_WHATSAPP = '';
@@ -88,6 +88,7 @@ function doPost(e) {
       lead.status = 'New';
     }
 
+    try { ensureFormatted_(); } catch (err) { console.error('Formatting failed: ' + err); }
     var saved = appendLead_(lead);
     // The lead is safe in the sheet now; a broken alert or email must not report it as failed.
     try { notifyNewLead_(saved.row); } catch (err) { console.error('Alerts failed: ' + err); }
@@ -185,6 +186,16 @@ function formatSheet() {
 
   buildOverview_(ss, sheet);
   toast_('Leads sheet styled and Overview tab updated.', 'Format sheet');
+}
+
+// Called before every lead is saved: restores the header row if someone deleted it, and styles
+// the sheet once per code version, so no one has to run formatSheet by hand.
+function ensureFormatted_() {
+  var props = PropertiesService.getScriptProperties();
+  var headerOk = String(getSheet_().getRange(1, 1).getValue()) === COLUMNS[0];
+  if (headerOk && props.getProperty('formattedVersion') === SCRIPT_VERSION) return;
+  formatSheet();
+  props.setProperty('formattedVersion', SCRIPT_VERSION);
 }
 
 // A one-glance summary tab built from formulas, so it stays live as leads arrive.
