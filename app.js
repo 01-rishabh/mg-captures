@@ -534,4 +534,13 @@
     thanks.focus({ preventScroll: true });
     thanks.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
   }
+
+  // "Send another request": a blank form back on step one, with the default choices restored.
+  document.querySelector('[data-new-request]').addEventListener('click', function () {
+    form.reset();
+    form.querySelectorAll('[aria-invalid]').forEach(function (el) { el.removeAttribute('aria-invalid'); });
+    document.getElementById('thanks').hidden = true;
+    form.hidden = false;
+    goTo(0);
+  });
 })();
