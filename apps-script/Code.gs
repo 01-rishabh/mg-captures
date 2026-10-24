@@ -25,7 +25,9 @@ var NTFY_SERVER = 'https://ntfy.sh';
 // Optional ntfy access token (free account) for higher rate limits. Leave '' if unused.
 var NTFY_TOKEN = '';
 
-// Optional: backup copy of every lead by email. Leave '' to turn off.
+// Email alert for every new lead. One address or several, separated by commas, e.g.
+// 'owner@gmail.com, partner@gmail.com'. Each address uses 1 of the account's 100 emails a day.
+// Leave '' to turn off.
 var OWNER_EMAIL = '';
 // Send the lead a "request received" email when they gave an address.
 var EMAIL_LEAD = true;
