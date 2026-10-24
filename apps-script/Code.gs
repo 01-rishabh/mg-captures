@@ -89,8 +89,9 @@ function doPost(e) {
     }
 
     var saved = appendLead_(lead);
-    notifyNewLead_(saved.row);
-    emailLead_(saved.id, lead);
+    // The lead is safe in the sheet now; a broken alert or email must not report it as failed.
+    try { notifyNewLead_(saved.row); } catch (err) { console.error('Alerts failed: ' + err); }
+    try { emailLead_(saved.id, lead); } catch (err) { console.error('Email failed: ' + err); }
     return json_({ ok: true, leadId: saved.id });
   } catch (err) {
     console.error(err);
